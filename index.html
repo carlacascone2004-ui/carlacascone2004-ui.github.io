@@ -631,13 +631,14 @@ function render() {
   }
 
   list.innerHTML = filtrate.map(v => {
-    const cc = catClass(v.categoria);
-    const g  = guadagno(v);
+    const cc  = catClass(v.categoria);
+    const col = COLORI[v.categoria];
+    const g   = guadagno(v);
     const ore = v.categoria === "Giulia" ? `<span class="tag-note">${v.ore}h</span>` : "";
     const nota = v.note ? `<span class="tag-note">${v.note}</span>` : "";
     return `
       <div class="visita-row">
-        <div class="visita-data-badge" style="background:var(--${cc}-badge);color:var(--${cc}-accent)">
+        <div class="visita-data-badge" style="background:${col.badge};color:${col.accent}">
           ${formatData(v.data)}
         </div>
         <div class="visita-info">
@@ -647,7 +648,7 @@ function render() {
             ${ore}${nota}
           </div>
         </div>
-        <div class="visita-importo" style="color:var(--${cc}-accent)">€${g}</div>
+        <div class="visita-importo" style="color:${col.accent}">€${g}</div>
         <div class="visita-actions">
           <button class="btn-icon" onclick="apriModifica(${v.id})" title="Modifica">✏️</button>
           <button class="btn-icon" onclick="apriConfermaElimina(${v.id})" title="Elimina">🗑</button>
