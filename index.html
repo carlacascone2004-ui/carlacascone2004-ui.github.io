@@ -580,6 +580,11 @@ function formatData(d) {
 function catClass(cat) {
   return { SAMOT:"samot", Privato:"privato", Giulia:"giulia" }[cat] || "";
 }
+const COLORI = {
+  SAMOT:   { badge: "#d0ede4", accent: "#2a7a5c" },
+  Privato: { badge: "#dcdcf4", accent: "#4a4a9a" },
+  Giulia:  { badge: "#f5e4c0", accent: "#b07020" },
+};
 
 // ─── RENDERING ────────────────────────────────────────────────────────────────
 function render() {
