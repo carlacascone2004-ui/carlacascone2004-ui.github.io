@@ -88,6 +88,24 @@
     text-align: center;
   }
 
+  /* Bottone impostazioni in header */
+  .btn-impostazioni {
+    position: absolute;
+    top: 20px;
+    right: 16px;
+    background: rgba(255,255,255,0.12);
+    border: 1px solid rgba(255,255,255,0.2);
+    color: var(--crema);
+    border-radius: 10px;
+    width: 38px;
+    height: 38px;
+    font-size: 18px;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .btn-impostazioni:hover { background: rgba(255,255,255,0.25); }
+
   .container { max-width: 680px; margin: 0 auto; padding: 0 16px; }
 
   .cards-grid {
@@ -253,6 +271,7 @@
   }
   .empty-state span { font-size: 36px; display: block; margin-bottom: 12px; }
 
+  /* ---- OVERLAY / MODAL generico ---- */
   .overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.55);
@@ -300,6 +319,30 @@
   .form-input:focus, .form-select:focus {
     outline: none; border-color: var(--verde-medio);
   }
+  .importo-wrap {
+    position: relative;
+  }
+  .importo-wrap .euro-pre {
+    position: absolute; left: 13px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px; color: var(--testo-muted);
+    pointer-events: none;
+  }
+  .importo-wrap .form-input {
+    padding-left: 26px;
+  }
+  .importo-hint {
+    font-size: 10px; color: var(--testo-muted);
+    margin-top: 4px; font-style: italic;
+  }
+  .importo-custom-badge {
+    display: inline-block;
+    font-size: 9px; letter-spacing: 1px;
+    background: var(--giulia-badge); color: var(--giulia-accent);
+    border-radius: 4px; padding: 1px 6px; margin-left: 6px;
+    font-weight: 600; text-transform: uppercase;
+    vertical-align: middle;
+  }
   .modal-actions { display: flex; gap: 10px; margin-top: 22px; }
   .btn-annulla {
     flex: 1; padding: 13px; border-radius: 12px;
@@ -314,6 +357,76 @@
   }
   .btn-salva:hover { background: var(--verde-medio); }
 
+  /* ---- MODAL IMPOSTAZIONI ---- */
+  .settings-section-title {
+    font-size: 10px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--testo-muted);
+    font-weight: 600;
+    margin: 18px 0 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--crema-scura);
+  }
+  .settings-section-title:first-of-type { margin-top: 0; }
+
+  .tariffa-row {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 10px;
+  }
+  .tariffa-label-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-width: 110px;
+  }
+  .tariffa-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .tariffa-dot.samot   { background: var(--samot-accent); }
+  .tariffa-dot.privato { background: var(--privato-accent); }
+  .tariffa-dot.giulia  { background: var(--giulia-accent); }
+  .tariffa-nome {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--testo);
+  }
+  .tariffa-input-wrap {
+    flex: 1;
+    position: relative;
+  }
+  .tariffa-input-wrap .euro-prefix {
+    position: absolute;
+    left: 12px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 14px;
+    color: var(--testo-muted);
+    pointer-events: none;
+  }
+  .tariffa-input-wrap .unit-suffix {
+    position: absolute;
+    right: 12px; top: 50%;
+    transform: translateY(-50%);
+    font-size: 11px;
+    color: var(--testo-muted);
+    pointer-events: none;
+  }
+  .tariffa-input {
+    width: 100%; padding: 10px 52px 10px 28px;
+    border-radius: 10px; border: 1px solid #ddd;
+    font-family: 'DM Sans', sans-serif; font-size: 14px;
+    color: var(--testo); background: var(--crema);
+    transition: border-color 0.15s;
+  }
+  .tariffa-input:focus {
+    outline: none; border-color: var(--verde-medio);
+  }
+
+  /* ---- CONFIRM ELIMINA ---- */
   .confirm-overlay {
     position: fixed; inset: 0;
     background: rgba(0,0,0,0.5);
@@ -357,6 +470,7 @@
     <div class="mese-label" id="mese-label"></div>
     <button onclick="cambioMese(1)">&#8250;</button>
   </div>
+  <button class="btn-impostazioni" onclick="apriImpostazioni()" title="Impostazioni tariffe">⚙️</button>
 </div>
 
 <div class="container">
@@ -394,7 +508,7 @@
   <div class="visite-list" id="visite-list"></div>
 </div>
 
-<!-- MODALE FORM -->
+<!-- MODALE FORM VISITA -->
 <div class="overlay" id="modal-overlay" style="display:none">
   <div class="modal">
     <div class="modal-handle"></div>
@@ -418,7 +532,15 @@
     </div>
     <div class="form-group" id="gruppo-ore" style="display:none">
       <label class="form-label">Ore</label>
-      <input class="form-input" id="f-ore" type="number" min="0.5" step="0.5" value="1">
+      <input class="form-input" id="f-ore" type="number" min="0.5" step="0.5" value="1" oninput="aggiornaPrezzoDefault()">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Importo <span id="importo-default-label"></span></label>
+      <div class="importo-wrap">
+        <span class="euro-pre">€</span>
+        <input class="form-input" id="f-importo" type="number" min="0" step="0.5" oninput="segnaImportoModificato()">
+      </div>
+      <div class="importo-hint" id="importo-hint"></div>
     </div>
     <div class="form-group">
       <label class="form-label">Note (opzionale)</label>
@@ -428,6 +550,59 @@
     <div class="modal-actions">
       <button class="btn-annulla" onclick="chiudiForm()">Annulla</button>
       <button class="btn-salva" onclick="salvaVisita()" id="btn-salva-text">Aggiungi</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODALE IMPOSTAZIONI -->
+<div class="overlay" id="modal-impostazioni" style="display:none">
+  <div class="modal">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Impostazioni tariffe</div>
+
+    <div class="settings-section-title">Tariffa per visita</div>
+
+    <div class="tariffa-row">
+      <div class="tariffa-label-wrap">
+        <div class="tariffa-dot samot"></div>
+        <div class="tariffa-nome">SAMOT</div>
+      </div>
+      <div class="tariffa-input-wrap">
+        <span class="euro-prefix">€</span>
+        <input class="tariffa-input" id="s-samot" type="number" min="0" step="0.5">
+        <span class="unit-suffix">/ visita</span>
+      </div>
+    </div>
+
+    <div class="tariffa-row">
+      <div class="tariffa-label-wrap">
+        <div class="tariffa-dot privato"></div>
+        <div class="tariffa-nome">Privato</div>
+      </div>
+      <div class="tariffa-input-wrap">
+        <span class="euro-prefix">€</span>
+        <input class="tariffa-input" id="s-privato" type="number" min="0" step="0.5">
+        <span class="unit-suffix">/ visita</span>
+      </div>
+    </div>
+
+    <div class="settings-section-title">Tariffa oraria</div>
+
+    <div class="tariffa-row">
+      <div class="tariffa-label-wrap">
+        <div class="tariffa-dot giulia"></div>
+        <div class="tariffa-nome">Giulia</div>
+      </div>
+      <div class="tariffa-input-wrap">
+        <span class="euro-prefix">€</span>
+        <input class="tariffa-input" id="s-giulia" type="number" min="0" step="0.5">
+        <span class="unit-suffix">/ ora</span>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="btn-annulla" onclick="chiudiImpostazioni()">Annulla</button>
+      <button class="btn-salva" onclick="salvaTariffe()">Salva tariffe</button>
     </div>
   </div>
 </div>
@@ -445,7 +620,10 @@
 </div>
 
 <script>
-const TARIFFE = { SAMOT: 22, Privato: 30, Giulia: 15 };
+// ── Tariffe di default ──────────────────────────────────────────────
+const TARIFFE_DEFAULT = { SAMOT: 22, Privato: 30, Giulia: 15 };
+let TARIFFE = { ...TARIFFE_DEFAULT };
+
 const MESI = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno",
               "Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
 
@@ -479,18 +657,29 @@ const VISITE_DEFAULT = [
 
 let visite = [];
 let filtroAttivo = "Tutti";
-let meseAttivo = "2025-04";
+
+// ── Mese corrente (non più hardcoded) ──────────────────────────────
+const oggi = new Date();
+let meseAttivo = `${oggi.getFullYear()}-${String(oggi.getMonth() + 1).padStart(2, "0")}`;
+
 let editId = null;
 let eliminaId = null;
 let nextId = 200;
 
+// ── Storage ────────────────────────────────────────────────────────
 function salvaStorage() {
-  localStorage.setItem("fisio_visite", JSON.stringify(visite));
-  localStorage.setItem("fisio_nextId", nextId);
+  localStorage.setItem("fisio_visite",  JSON.stringify(visite));
+  localStorage.setItem("fisio_nextId",  nextId);
+  localStorage.setItem("fisio_tariffe", JSON.stringify(TARIFFE));
 }
 function caricaStorage() {
-  const saved = localStorage.getItem("fisio_visite");
-  const sid   = localStorage.getItem("fisio_nextId");
+  const saved    = localStorage.getItem("fisio_visite");
+  const sid      = localStorage.getItem("fisio_nextId");
+  const tarSaved = localStorage.getItem("fisio_tariffe");
+
+  if (tarSaved) {
+    TARIFFE = { ...TARIFFE_DEFAULT, ...JSON.parse(tarSaved) };
+  }
   if (saved) {
     visite = JSON.parse(saved);
     nextId = sid ? parseInt(sid) : 200;
@@ -500,9 +689,15 @@ function caricaStorage() {
   }
 }
 
+// ── Calcoli ────────────────────────────────────────────────────────
+function prezzoDefault(cat, ore) {
+  const t = TARIFFE[cat] || 0;
+  return cat === "Giulia" ? t * (ore || 1) : t;
+}
 function guadagno(v) {
-  const t = TARIFFE[v.categoria] || 0;
-  return v.categoria === "Giulia" ? t * v.ore : t;
+  // Se la visita ha un importo personalizzato lo usa, altrimenti calcola dal default
+  if (v.importoCustom != null) return v.importoCustom;
+  return prezzoDefault(v.categoria, v.ore);
 }
 function formatData(d) {
   const [y,m,g] = d.split("-");
@@ -517,6 +712,7 @@ const COLORI = {
   Giulia:  { badge: "#f5e4c0", accent: "#b07020" },
 };
 
+// ── Render ─────────────────────────────────────────────────────────
 function render() {
   const [y, m] = meseAttivo.split("-");
   document.getElementById("mese-label").textContent =
@@ -582,6 +778,7 @@ function render() {
   }).join("");
 }
 
+// ── Navigazione mese ───────────────────────────────────────────────
 function cambioMese(dir) {
   let [y, m] = meseAttivo.split("-").map(Number);
   m += dir;
@@ -598,12 +795,48 @@ function setFiltro(f) {
   render();
 }
 
+// ── Form visita ────────────────────────────────────────────────────
+let _importoManualmenteModificato = false;
+
 function aggiornaCampiForm() {
   const cat = document.getElementById("f-categoria").value;
   document.getElementById("gruppo-ore").style.display = cat === "Giulia" ? "block" : "none";
+  if (!_importoManualmenteModificato) impostaImportoDefault();
+}
+
+function aggiornaPrezzoDefault() {
+  if (!_importoManualmenteModificato) impostaImportoDefault();
+}
+
+function impostaImportoDefault() {
+  const cat = document.getElementById("f-categoria").value;
+  const ore = parseFloat(document.getElementById("f-ore").value) || 1;
+  const def = prezzoDefault(cat, ore);
+  document.getElementById("f-importo").value = def;
+  const suffix = cat === "Giulia" ? ` (€${TARIFFE.Giulia}/ora × ${ore}h)` : "";
+  document.getElementById("importo-hint").textContent = `Default: €${def}${suffix} — modifica solo se diverso`;
+  document.getElementById("importo-default-label").textContent = "";
+}
+
+function segnaImportoModificato() {
+  const cat = document.getElementById("f-categoria").value;
+  const ore = parseFloat(document.getElementById("f-ore").value) || 1;
+  const def = prezzoDefault(cat, ore);
+  const val = parseFloat(document.getElementById("f-importo").value);
+  _importoManualmenteModificato = true;
+  if (!isNaN(val) && val !== def) {
+    document.getElementById("importo-default-label").innerHTML =
+      `<span class="importo-custom-badge">personalizzato</span>`;
+    document.getElementById("importo-hint").textContent = `Default: €${def}`;
+  } else {
+    document.getElementById("importo-default-label").textContent = "";
+    document.getElementById("importo-hint").textContent = `Default: €${def} — modifica solo se diverso`;
+    _importoManualmenteModificato = false;
+  }
 }
 function apriForm() {
   editId = null;
+  _importoManualmenteModificato = false;
   document.getElementById("modal-title").textContent = "Nuova visita";
   document.getElementById("btn-salva-text").textContent = "Aggiungi";
   document.getElementById("f-categoria").value = "SAMOT";
@@ -612,12 +845,14 @@ function apriForm() {
   document.getElementById("f-ore").value = "1";
   document.getElementById("f-note").value = "";
   aggiornaCampiForm();
+  impostaImportoDefault();
   document.getElementById("modal-overlay").style.display = "flex";
 }
 function apriModifica(id) {
   const v = visite.find(x => x.id === id);
   if (!v) return;
   editId = id;
+  _importoManualmenteModificato = false;
   document.getElementById("modal-title").textContent = "Modifica visita";
   document.getElementById("btn-salva-text").textContent = "Salva modifiche";
   document.getElementById("f-categoria").value = v.categoria;
@@ -626,6 +861,14 @@ function apriModifica(id) {
   document.getElementById("f-ore").value = v.ore;
   document.getElementById("f-note").value = v.note;
   aggiornaCampiForm();
+  // Se ha un importo custom lo mostra già come personalizzato
+  if (v.importoCustom != null) {
+    document.getElementById("f-importo").value = v.importoCustom;
+    _importoManualmenteModificato = true;
+    segnaImportoModificato();
+  } else {
+    impostaImportoDefault();
+  }
   document.getElementById("modal-overlay").style.display = "flex";
 }
 function chiudiForm() {
@@ -655,6 +898,33 @@ function salvaVisita() {
   render();
 }
 
+// ── Impostazioni tariffe ───────────────────────────────────────────
+function apriImpostazioni() {
+  document.getElementById("s-samot").value   = TARIFFE.SAMOT;
+  document.getElementById("s-privato").value = TARIFFE.Privato;
+  document.getElementById("s-giulia").value  = TARIFFE.Giulia;
+  document.getElementById("modal-impostazioni").style.display = "flex";
+}
+function chiudiImpostazioni() {
+  document.getElementById("modal-impostazioni").style.display = "none";
+}
+function salvaTariffe() {
+  const s = parseFloat(document.getElementById("s-samot").value);
+  const p = parseFloat(document.getElementById("s-privato").value);
+  const g = parseFloat(document.getElementById("s-giulia").value);
+  if (isNaN(s) || isNaN(p) || isNaN(g) || s < 0 || p < 0 || g < 0) {
+    alert("Inserisci valori validi per tutte le tariffe.");
+    return;
+  }
+  TARIFFE.SAMOT   = s;
+  TARIFFE.Privato = p;
+  TARIFFE.Giulia  = g;
+  salvaStorage();
+  chiudiImpostazioni();
+  render();
+}
+
+// ── Elimina ────────────────────────────────────────────────────────
 function apriConfermaElimina(id) {
   eliminaId = id;
   document.getElementById("confirm-overlay").style.display = "flex";
@@ -672,10 +942,15 @@ function confermElimina() {
   chiudiConferma();
 }
 
+// ── Chiudi modal cliccando fuori ───────────────────────────────────
 document.getElementById("modal-overlay").addEventListener("click", function(e) {
   if (e.target === this) chiudiForm();
 });
+document.getElementById("modal-impostazioni").addEventListener("click", function(e) {
+  if (e.target === this) chiudiImpostazioni();
+});
 
+// ── Init ───────────────────────────────────────────────────────────
 caricaStorage();
 render();
 </script>
