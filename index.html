@@ -26,6 +26,10 @@
     --giulia-bg: #fdf4e8;
     --giulia-accent: #b07020;
     --giulia-badge: #f5e4c0;
+
+    --medicare-bg: #e9f0f8;
+    --medicare-accent: #2a5a9a;
+    --medicare-badge: #d2e2f5;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -88,29 +92,47 @@
     text-align: center;
   }
 
-  /* Bottone impostazioni in header */
-  .btn-impostazioni {
+  /* Bottoni header */
+  .header-actions {
     position: absolute;
     top: 20px;
     right: 16px;
+    display: flex;
+    gap: 8px;
+  }
+  .btn-impostazioni, .btn-statistiche {
     background: rgba(255,255,255,0.12);
     border: 1px solid rgba(255,255,255,0.2);
     color: var(--crema);
     border-radius: 10px;
     width: 38px;
     height: 38px;
-    font-size: 18px;
+    font-size: 16px;
     cursor: pointer;
     transition: background 0.2s;
     display: flex; align-items: center; justify-content: center;
   }
-  .btn-impostazioni:hover { background: rgba(255,255,255,0.25); }
+  .btn-impostazioni:hover, .btn-statistiche:hover { background: rgba(255,255,255,0.25); }
+  .btn-statistiche.active { background: var(--verde-medio); border-color: var(--verde-medio); }
+
+  .log-status {
+    position: absolute;
+    top: 62px;
+    right: 16px;
+    font-size: 9px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--verde-chiaro);
+    opacity: 0.85;
+    text-align: right;
+    max-width: 160px;
+  }
 
   .container { max-width: 680px; margin: 0 auto; padding: 0 16px; }
 
   .cards-grid {
     display: grid;
-    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-columns: 1fr 1fr;
     gap: 10px;
     margin: 20px 0 12px;
   }
@@ -122,9 +144,10 @@
     transition: transform 0.15s;
   }
   .card:hover { transform: translateY(-2px); }
-  .card.samot   { background: var(--samot-bg);   border-color: var(--samot-badge); }
-  .card.privato { background: var(--privato-bg); border-color: var(--privato-badge); }
-  .card.giulia  { background: var(--giulia-bg);  border-color: var(--giulia-badge); }
+  .card.samot     { background: var(--samot-bg);     border-color: var(--samot-badge); }
+  .card.privato   { background: var(--privato-bg);   border-color: var(--privato-badge); }
+  .card.giulia    { background: var(--giulia-bg);    border-color: var(--giulia-badge); }
+  .card.medicare  { background: var(--medicare-bg);  border-color: var(--medicare-badge); }
   .card-label {
     font-size: 9px;
     letter-spacing: 2.5px;
@@ -132,18 +155,20 @@
     margin-bottom: 5px;
     font-weight: 500;
   }
-  .card.samot   .card-label { color: var(--samot-accent); }
-  .card.privato .card-label { color: var(--privato-accent); }
-  .card.giulia  .card-label { color: var(--giulia-accent); }
+  .card.samot     .card-label { color: var(--samot-accent); }
+  .card.privato   .card-label { color: var(--privato-accent); }
+  .card.giulia    .card-label { color: var(--giulia-accent); }
+  .card.medicare  .card-label { color: var(--medicare-accent); }
   .card-amount {
     font-family: 'Cormorant Garamond', serif;
     font-size: 26px;
     font-weight: 700;
     line-height: 1;
   }
-  .card.samot   .card-amount { color: var(--samot-accent); }
-  .card.privato .card-amount { color: var(--privato-accent); }
-  .card.giulia  .card-amount { color: var(--giulia-accent); }
+  .card.samot     .card-amount { color: var(--samot-accent); }
+  .card.privato   .card-amount { color: var(--privato-accent); }
+  .card.giulia    .card-amount { color: var(--giulia-accent); }
+  .card.medicare  .card-amount { color: var(--medicare-accent); }
   .card-count { font-size: 10px; color: var(--testo-muted); margin-top: 4px; }
 
   .totale-bar {
@@ -207,6 +232,44 @@
   }
   .btn-aggiungi:hover { background: var(--verde-scuro); }
 
+  /* ---- STATISTICHE / GRAFICI ---- */
+  .stats-panel {
+    background: #fff;
+    border-radius: 14px;
+    box-shadow: 0 2px 16px rgba(26,46,36,0.07);
+    padding: 20px 18px;
+    margin-bottom: 20px;
+  }
+  .stats-panel.hidden { display: none; }
+  .stats-block { margin-bottom: 22px; }
+  .stats-block:last-child { margin-bottom: 0; }
+  .stats-title {
+    font-family: 'Cormorant Garamond', serif;
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--testo);
+    margin-bottom: 3px;
+  }
+  .stats-sub {
+    font-size: 11px;
+    color: var(--testo-muted);
+    margin-bottom: 10px;
+  }
+  .chart-svg { width: 100%; height: auto; display: block; }
+  .chart-bar-label { font-size: 9px; fill: var(--testo-muted); font-family: 'DM Sans', sans-serif; }
+  .chart-value-label { font-size: 9px; fill: var(--testo); font-family: 'DM Sans', sans-serif; font-weight: 500; }
+  .chart-empty { font-size: 12px; color: var(--testo-muted); text-align: center; padding: 20px 0; }
+  .stats-best {
+    display: inline-block;
+    margin-top: 8px;
+    font-size: 11px;
+    color: var(--verde-medio);
+    background: var(--samot-bg);
+    border-radius: 8px;
+    padding: 5px 10px;
+    font-weight: 500;
+  }
+
   .visite-list {
     background: #fff;
     border-radius: 14px;
@@ -246,9 +309,10 @@
     font-size: 10px; border-radius: 4px;
     padding: 2px 7px; font-weight: 500;
   }
-  .tag.samot   { background: var(--samot-badge);   color: var(--samot-accent); }
-  .tag.privato { background: var(--privato-badge); color: var(--privato-accent); }
-  .tag.giulia  { background: var(--giulia-badge);  color: var(--giulia-accent); }
+  .tag.samot     { background: var(--samot-badge);     color: var(--samot-accent); }
+  .tag.privato   { background: var(--privato-badge);   color: var(--privato-accent); }
+  .tag.giulia    { background: var(--giulia-badge);    color: var(--giulia-accent); }
+  .tag.medicare  { background: var(--medicare-badge);  color: var(--medicare-accent); }
   .tag-note { font-size: 10px; color: var(--testo-muted); font-style: italic; }
   .visita-importo {
     font-family: 'Cormorant Garamond', serif;
@@ -286,6 +350,8 @@
     border-radius: 20px 20px 0 0;
     width: 100%; max-width: 680px;
     padding: 28px 20px 48px;
+    max-height: 90vh;
+    overflow-y: auto;
     animation: slideUp 0.28s cubic-bezier(0.32, 0.72, 0, 1);
   }
   @keyframes slideUp {
@@ -387,9 +453,10 @@
     border-radius: 50%;
     flex-shrink: 0;
   }
-  .tariffa-dot.samot   { background: var(--samot-accent); }
-  .tariffa-dot.privato { background: var(--privato-accent); }
-  .tariffa-dot.giulia  { background: var(--giulia-accent); }
+  .tariffa-dot.samot     { background: var(--samot-accent); }
+  .tariffa-dot.privato   { background: var(--privato-accent); }
+  .tariffa-dot.giulia    { background: var(--giulia-accent); }
+  .tariffa-dot.medicare  { background: var(--medicare-accent); }
   .tariffa-nome {
     font-size: 13px;
     font-weight: 500;
@@ -425,6 +492,42 @@
   .tariffa-input:focus {
     outline: none; border-color: var(--verde-medio);
   }
+
+  .log-section {
+    margin-top: 4px;
+  }
+  .log-box {
+    background: var(--crema);
+    border: 1px solid var(--crema-scura);
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--testo-muted);
+    margin-bottom: 10px;
+    line-height: 1.5;
+  }
+  .log-box strong { color: var(--testo); }
+  .log-actions { display: flex; gap: 8px; flex-wrap: wrap; }
+  .btn-log {
+    padding: 9px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--verde-medio);
+    background: #fff;
+    color: var(--verde-medio);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .btn-log:hover { background: var(--verde-medio); color: #fff; }
+  .btn-log.attivo { background: var(--verde-medio); color: #fff; }
+  .log-dot {
+    display: inline-block; width: 7px; height: 7px;
+    border-radius: 50%; margin-right: 5px;
+    background: #c44;
+  }
+  .log-dot.on { background: var(--verde-medio); }
 
   /* ---- CONFIRM ELIMINA ---- */
   .confirm-overlay {
@@ -470,7 +573,10 @@
     <div class="mese-label" id="mese-label"></div>
     <button onclick="cambioMese(1)">&#8250;</button>
   </div>
-  <button class="btn-impostazioni" onclick="apriImpostazioni()" title="Impostazioni tariffe">⚙️</button>
+  <div class="header-actions">
+    <button class="btn-statistiche" id="btn-statistiche" onclick="toggleStatistiche()" title="Statistiche">📊</button>
+    <button class="btn-impostazioni" onclick="apriImpostazioni()" title="Impostazioni tariffe">⚙️</button>
+  </div>
 </div>
 
 <div class="container">
@@ -490,6 +596,11 @@
       <div class="card-amount" id="tot-giulia">€0</div>
       <div class="card-count" id="cnt-giulia">0 ore</div>
     </div>
+    <div class="card medicare">
+      <div class="card-label">Medicare</div>
+      <div class="card-amount" id="tot-medicare">€0</div>
+      <div class="card-count" id="cnt-medicare">0 visite</div>
+    </div>
   </div>
 
   <div class="totale-bar">
@@ -497,11 +608,25 @@
     <div class="totale-bar-amount" id="totale-amount">€0</div>
   </div>
 
+  <div class="stats-panel hidden" id="stats-panel">
+    <div class="stats-block">
+      <div class="stats-title">Andamento mensile</div>
+      <div class="stats-sub">Incasso totale per mese (tutte le categorie)</div>
+      <div id="chart-mensile"></div>
+    </div>
+    <div class="stats-block">
+      <div class="stats-title">Produttività per giorno della settimana</div>
+      <div class="stats-sub">Incasso totale e media a giornata lavorata per ciascun giorno</div>
+      <div id="chart-giorni"></div>
+    </div>
+  </div>
+
   <div class="toolbar">
     <button class="filtro-btn active" data-filtro="Tutti" onclick="setFiltro('Tutti')">Tutti</button>
     <button class="filtro-btn" data-filtro="SAMOT" onclick="setFiltro('SAMOT')">SAMOT</button>
     <button class="filtro-btn" data-filtro="Privato" onclick="setFiltro('Privato')">Privato</button>
     <button class="filtro-btn" data-filtro="Giulia" onclick="setFiltro('Giulia')">Giulia</button>
+    <button class="filtro-btn" data-filtro="Medicare" onclick="setFiltro('Medicare')">Medicare</button>
     <button class="btn-aggiungi" onclick="apriForm()">+ Aggiungi</button>
   </div>
 
@@ -520,6 +645,7 @@
         <option value="SAMOT">SAMOT</option>
         <option value="Privato">Privato</option>
         <option value="Giulia">Giulia</option>
+        <option value="Medicare">Medicare</option>
       </select>
     </div>
     <div class="form-group">
@@ -586,6 +712,18 @@
       </div>
     </div>
 
+    <div class="tariffa-row">
+      <div class="tariffa-label-wrap">
+        <div class="tariffa-dot medicare"></div>
+        <div class="tariffa-nome">Medicare</div>
+      </div>
+      <div class="tariffa-input-wrap">
+        <span class="euro-prefix">€</span>
+        <input class="tariffa-input" id="s-medicare" type="number" min="0" step="0.5">
+        <span class="unit-suffix">/ visita</span>
+      </div>
+    </div>
+
     <div class="settings-section-title">Tariffa oraria</div>
 
     <div class="tariffa-row">
@@ -597,6 +735,18 @@
         <span class="euro-prefix">€</span>
         <input class="tariffa-input" id="s-giulia" type="number" min="0" step="0.5">
         <span class="unit-suffix">/ ora</span>
+      </div>
+    </div>
+
+    <div class="settings-section-title">Sincronizzazione log.md</div>
+    <div class="log-section">
+      <div class="log-box" id="log-status-box">
+        <span class="log-dot" id="log-dot"></span><strong id="log-status-text">Non collegato</strong><br>
+        <span id="log-status-detail">Collega il file log.md nella cartella del progetto per salvare automaticamente ogni visita.</span>
+      </div>
+      <div class="log-actions">
+        <button class="btn-log" id="btn-collega-log" onclick="collegaLogFile()">📄 Collega log.md</button>
+        <button class="btn-log" onclick="scaricaLogFallback()">⬇️ Scarica log.md</button>
       </div>
     </div>
 
@@ -621,11 +771,12 @@
 
 <script>
 // ── Tariffe di default ──────────────────────────────────────────────
-const TARIFFE_DEFAULT = { SAMOT: 22, Privato: 30, Giulia: 15 };
+const TARIFFE_DEFAULT = { SAMOT: 22, Privato: 30, Giulia: 15, Medicare: 25 };
 let TARIFFE = { ...TARIFFE_DEFAULT };
 
 const MESI = ["Gennaio","Febbraio","Marzo","Aprile","Maggio","Giugno",
               "Luglio","Agosto","Settembre","Ottobre","Novembre","Dicembre"];
+const GIORNI_SETT = ["Lun","Mar","Mer","Gio","Ven","Sab","Dom"];
 
 const VISITE_DEFAULT = [
   { id:1,  categoria:"Giulia",  paziente:"Giulia",       data:"2025-04-09", ore:1, note:"" },
@@ -658,13 +809,14 @@ const VISITE_DEFAULT = [
 let visite = [];
 let filtroAttivo = "Tutti";
 
-// ── Mese corrente (non più hardcoded) ──────────────────────────────
+// ── Mese corrente ───────────────────────────────────────────────────
 const oggi = new Date();
 let meseAttivo = `${oggi.getFullYear()}-${String(oggi.getMonth() + 1).padStart(2, "0")}`;
 
 let editId = null;
 let eliminaId = null;
 let nextId = 200;
+let statisticheVisibili = false;
 
 // ── Storage ────────────────────────────────────────────────────────
 function salvaStorage() {
@@ -695,8 +847,8 @@ function prezzoDefault(cat, ore) {
   return cat === "Giulia" ? t * (ore || 1) : t;
 }
 function guadagno(v) {
-  // Se la visita ha un importo personalizzato lo usa, altrimenti calcola dal default
-  if (v.importoCustom != null) return v.importoCustom;
+  // Se la visita ha un importo personalizzato (diverso dal default) lo usa, altrimenti calcola dal default
+  if (v.importoCustom != null && !isNaN(v.importoCustom)) return v.importoCustom;
   return prezzoDefault(v.categoria, v.ore);
 }
 function formatData(d) {
@@ -704,12 +856,13 @@ function formatData(d) {
   return `${g}/${m}`;
 }
 function catClass(cat) {
-  return { SAMOT:"samot", Privato:"privato", Giulia:"giulia" }[cat] || "";
+  return { SAMOT:"samot", Privato:"privato", Giulia:"giulia", Medicare:"medicare" }[cat] || "";
 }
 const COLORI = {
-  SAMOT:   { badge: "#d0ede4", accent: "#2a7a5c" },
-  Privato: { badge: "#dcdcf4", accent: "#4a4a9a" },
-  Giulia:  { badge: "#f5e4c0", accent: "#b07020" },
+  SAMOT:    { badge: "#d0ede4", accent: "#2a7a5c" },
+  Privato:  { badge: "#dcdcf4", accent: "#4a4a9a" },
+  Giulia:   { badge: "#f5e4c0", accent: "#b07020" },
+  Medicare: { badge: "#d2e2f5", accent: "#2a5a9a" },
 };
 
 // ── Render ─────────────────────────────────────────────────────────
@@ -726,56 +879,59 @@ function render() {
     })
     .sort((a,b) => b.data.localeCompare(a.data));
 
-  const tot = { SAMOT:0, Privato:0, Giulia:0 };
-  const cnt = { SAMOT:0, Privato:0, Giulia:0 };
+  const tot = { SAMOT:0, Privato:0, Giulia:0, Medicare:0 };
+  const cnt = { SAMOT:0, Privato:0, Giulia:0, Medicare:0 };
   let totOreGiulia = 0;
   filtrate.forEach(v => {
     tot[v.categoria] = (tot[v.categoria]||0) + guadagno(v);
     cnt[v.categoria] = (cnt[v.categoria]||0) + 1;
     if (v.categoria === "Giulia") totOreGiulia += v.ore;
   });
-  const totale = tot.SAMOT + tot.Privato + tot.Giulia;
+  const totale = tot.SAMOT + tot.Privato + tot.Giulia + tot.Medicare;
 
-  document.getElementById("tot-samot").textContent   = `€${tot.SAMOT}`;
-  document.getElementById("tot-privato").textContent = `€${tot.Privato}`;
-  document.getElementById("tot-giulia").textContent  = `€${tot.Giulia}`;
-  document.getElementById("cnt-samot").textContent   = `${cnt.SAMOT} visite`;
-  document.getElementById("cnt-privato").textContent = `${cnt.Privato} visite`;
-  document.getElementById("cnt-giulia").textContent  = totOreGiulia > 0 ? `${totOreGiulia}h` : "0 ore";
+  document.getElementById("tot-samot").textContent    = `€${tot.SAMOT}`;
+  document.getElementById("tot-privato").textContent  = `€${tot.Privato}`;
+  document.getElementById("tot-giulia").textContent   = `€${tot.Giulia}`;
+  document.getElementById("tot-medicare").textContent = `€${tot.Medicare}`;
+  document.getElementById("cnt-samot").textContent    = `${cnt.SAMOT} visite`;
+  document.getElementById("cnt-privato").textContent  = `${cnt.Privato} visite`;
+  document.getElementById("cnt-giulia").textContent   = totOreGiulia > 0 ? `${totOreGiulia}h` : "0 ore";
+  document.getElementById("cnt-medicare").textContent = `${cnt.Medicare} visite`;
   document.getElementById("totale-amount").textContent = `€${totale}`;
   document.getElementById("totale-label").textContent  = `Totale ${MESI[parseInt(m)-1]} ${y}`;
 
   const list = document.getElementById("visite-list");
   if (filtrate.length === 0) {
     list.innerHTML = `<div class="empty-state"><span>📋</span>Nessuna visita in questo periodo</div>`;
-    return;
+  } else {
+    list.innerHTML = filtrate.map(v => {
+      const cc  = catClass(v.categoria);
+      const col = COLORI[v.categoria];
+      const g   = guadagno(v);
+      const ore  = v.categoria === "Giulia" ? `<span class="tag-note">${v.ore}h</span>` : "";
+      const nota = v.note ? `<span class="tag-note">${v.note}</span>` : "";
+      return `
+        <div class="visita-row">
+          <div class="visita-data-badge" style="background:${col.badge};color:${col.accent}">
+            ${formatData(v.data)}
+          </div>
+          <div class="visita-info">
+            <div class="visita-nome">${v.paziente}</div>
+            <div class="visita-tags">
+              <span class="tag ${cc}">${v.categoria}</span>
+              ${ore}${nota}
+            </div>
+          </div>
+          <div class="visita-importo" style="color:${col.accent}">€${g}</div>
+          <div class="visita-actions">
+            <button class="btn-icon" onclick="apriModifica(${v.id})" title="Modifica">✏️</button>
+            <button class="btn-icon" onclick="apriConfermaElimina(${v.id})" title="Elimina">🗑</button>
+          </div>
+        </div>`;
+    }).join("");
   }
 
-  list.innerHTML = filtrate.map(v => {
-    const cc  = catClass(v.categoria);
-    const col = COLORI[v.categoria];
-    const g   = guadagno(v);
-    const ore  = v.categoria === "Giulia" ? `<span class="tag-note">${v.ore}h</span>` : "";
-    const nota = v.note ? `<span class="tag-note">${v.note}</span>` : "";
-    return `
-      <div class="visita-row">
-        <div class="visita-data-badge" style="background:${col.badge};color:${col.accent}">
-          ${formatData(v.data)}
-        </div>
-        <div class="visita-info">
-          <div class="visita-nome">${v.paziente}</div>
-          <div class="visita-tags">
-            <span class="tag ${cc}">${v.categoria}</span>
-            ${ore}${nota}
-          </div>
-        </div>
-        <div class="visita-importo" style="color:${col.accent}">€${g}</div>
-        <div class="visita-actions">
-          <button class="btn-icon" onclick="apriModifica(${v.id})" title="Modifica">✏️</button>
-          <button class="btn-icon" onclick="apriConfermaElimina(${v.id})" title="Elimina">🗑</button>
-        </div>
-      </div>`;
-  }).join("");
+  if (statisticheVisibili) renderStatistiche();
 }
 
 // ── Navigazione mese ───────────────────────────────────────────────
@@ -793,6 +949,77 @@ function setFiltro(f) {
     b.classList.toggle("active", b.dataset.filtro === f);
   });
   render();
+}
+
+// ── Statistiche / grafici ─────────────────────────────────────────
+function toggleStatistiche() {
+  statisticheVisibili = !statisticheVisibili;
+  document.getElementById("stats-panel").classList.toggle("hidden", !statisticheVisibili);
+  document.getElementById("btn-statistiche").classList.toggle("active", statisticheVisibili);
+  if (statisticheVisibili) renderStatistiche();
+}
+
+function svgBarChart(data, opts) {
+  // data: [{label, value, sub}], opts: {width, height, prefix, suffix}
+  const W = opts.width || 640, H = opts.height || 160;
+  const padL = 8, padR = 8, padT = 18, padB = 26;
+  const innerW = W - padL - padR;
+  const innerH = H - padT - padB;
+  const n = data.length;
+  if (n === 0) return `<div class="chart-empty">Non ci sono ancora dati sufficienti.</div>`;
+  const maxVal = Math.max(...data.map(d => d.value), 1);
+  const gap = innerW / n * 0.28;
+  const barW = (innerW / n) - gap;
+  let bars = "";
+  data.forEach((d, i) => {
+    const x = padL + i * (innerW / n) + gap/2;
+    const h = maxVal > 0 ? (d.value / maxVal) * innerH : 0;
+    const y = padT + (innerH - h);
+    const isMax = d.value === maxVal && d.value > 0;
+    const fill = isMax ? "var(--verde-medio)" : "var(--verde-chiaro)";
+    bars += `<rect x="${x.toFixed(1)}" y="${y.toFixed(1)}" width="${barW.toFixed(1)}" height="${h.toFixed(1)}" rx="3" fill="${fill}"></rect>`;
+    bars += `<text class="chart-value-label" x="${(x+barW/2).toFixed(1)}" y="${(y-5).toFixed(1)}" text-anchor="middle">${opts.prefix||""}${Math.round(d.value)}${opts.suffix||""}</text>`;
+    bars += `<text class="chart-bar-label" x="${(x+barW/2).toFixed(1)}" y="${H-8}" text-anchor="middle">${d.label}</text>`;
+  });
+  return `<svg class="chart-svg" viewBox="0 0 ${W} ${H}" xmlns="http://www.w3.org/2000/svg">${bars}</svg>`;
+}
+
+function renderStatistiche() {
+  // -- Andamento mensile: somma su TUTTE le visite, tutti i mesi presenti (max ultimi 12) --
+  const perMese = {};
+  visite.forEach(v => {
+    const key = v.data.substring(0,7);
+    perMese[key] = (perMese[key]||0) + guadagno(v);
+  });
+  const mesiOrdinati = Object.keys(perMese).sort();
+  const ultimi12 = mesiOrdinati.slice(-12);
+  const dataMensile = ultimi12.map(key => {
+    const [yy, mm] = key.split("-");
+    return { label: `${MESI[parseInt(mm)-1].substring(0,3)} '${yy.substring(2)}`, value: perMese[key] };
+  });
+  document.getElementById("chart-mensile").innerHTML = svgBarChart(dataMensile, { prefix:"€" });
+
+  // -- Produttività per giorno della settimana: somma e media su TUTTE le visite --
+  const perGiorno = Array(7).fill(0).map(() => ({ tot:0, cnt:0 }));
+  visite.forEach(v => {
+    const d = new Date(v.data + "T00:00:00");
+    let idx = d.getDay() - 1; // Luned\u00ec = 0 ... Domenica = 6
+    if (idx < 0) idx = 6;
+    perGiorno[idx].tot += guadagno(v);
+    perGiorno[idx].cnt += 1;
+  });
+  const dataGiorni = GIORNI_SETT.map((g, i) => ({ label: g, value: perGiorno[i].tot, cnt: perGiorno[i].cnt }));
+  document.getElementById("chart-giorni").innerHTML = svgBarChart(dataGiorni, { prefix:"€" });
+
+  let migliore = null;
+  dataGiorni.forEach(d => {
+    const media = d.cnt > 0 ? d.value / d.cnt : 0;
+    if (d.cnt > 0 && (!migliore || media > migliore.media)) migliore = { label: d.label, media };
+  });
+  const bestEl = document.getElementById("chart-giorni");
+  if (migliore) {
+    bestEl.innerHTML += `<div class="stats-best">📈 Giorno più produttivo in media: ${migliore.label} (€${migliore.media.toFixed(1)}/visita)</div>`;
+  }
 }
 
 // ── Form visita ────────────────────────────────────────────────────
@@ -862,7 +1089,7 @@ function apriModifica(id) {
   document.getElementById("f-note").value = v.note;
   aggiornaCampiForm();
   // Se ha un importo custom lo mostra già come personalizzato
-  if (v.importoCustom != null) {
+  if (v.importoCustom != null && !isNaN(v.importoCustom)) {
     document.getElementById("f-importo").value = v.importoCustom;
     _importoManualmenteModificato = true;
     segnaImportoModificato();
@@ -880,29 +1107,38 @@ function salvaVisita() {
   const dat = document.getElementById("f-data").value;
   const ore = parseFloat(document.getElementById("f-ore").value) || 1;
   const not = document.getElementById("f-note").value.trim();
+  const importoInserito = parseFloat(document.getElementById("f-importo").value);
   if (!paz || !dat) {
     document.getElementById("f-paziente").style.borderColor = "#c44";
     return;
   }
+
+  // Confronta l'importo inserito col default: se diverso, lo salviamo come personalizzato.
+  const def = prezzoDefault(cat, ore);
+  const importoCustom = (!isNaN(importoInserito) && importoInserito !== def) ? importoInserito : null;
+
   if (editId !== null) {
     visite = visite.map(v => v.id === editId
-      ? { ...v, categoria:cat, paziente:paz, data:dat, ore, note:not }
+      ? { ...v, categoria:cat, paziente:paz, data:dat, ore, note:not, importoCustom }
       : v);
   } else {
-    visite.push({ id: nextId++, categoria:cat, paziente:paz, data:dat, ore, note:not });
+    visite.push({ id: nextId++, categoria:cat, paziente:paz, data:dat, ore, note:not, importoCustom });
   }
   salvaStorage();
   chiudiForm();
   const meseVisita = dat.substring(0,7);
   if (meseVisita !== meseAttivo) meseAttivo = meseVisita;
   render();
+  scriviLog();
 }
 
 // ── Impostazioni tariffe ───────────────────────────────────────────
 function apriImpostazioni() {
-  document.getElementById("s-samot").value   = TARIFFE.SAMOT;
-  document.getElementById("s-privato").value = TARIFFE.Privato;
-  document.getElementById("s-giulia").value  = TARIFFE.Giulia;
+  document.getElementById("s-samot").value    = TARIFFE.SAMOT;
+  document.getElementById("s-privato").value  = TARIFFE.Privato;
+  document.getElementById("s-giulia").value   = TARIFFE.Giulia;
+  document.getElementById("s-medicare").value = TARIFFE.Medicare;
+  aggiornaLogStatusUI();
   document.getElementById("modal-impostazioni").style.display = "flex";
 }
 function chiudiImpostazioni() {
@@ -912,13 +1148,15 @@ function salvaTariffe() {
   const s = parseFloat(document.getElementById("s-samot").value);
   const p = parseFloat(document.getElementById("s-privato").value);
   const g = parseFloat(document.getElementById("s-giulia").value);
-  if (isNaN(s) || isNaN(p) || isNaN(g) || s < 0 || p < 0 || g < 0) {
+  const me = parseFloat(document.getElementById("s-medicare").value);
+  if (isNaN(s) || isNaN(p) || isNaN(g) || isNaN(me) || s < 0 || p < 0 || g < 0 || me < 0) {
     alert("Inserisci valori validi per tutte le tariffe.");
     return;
   }
-  TARIFFE.SAMOT   = s;
-  TARIFFE.Privato = p;
-  TARIFFE.Giulia  = g;
+  TARIFFE.SAMOT    = s;
+  TARIFFE.Privato  = p;
+  TARIFFE.Giulia   = g;
+  TARIFFE.Medicare = me;
   salvaStorage();
   chiudiImpostazioni();
   render();
@@ -938,6 +1176,7 @@ function confermElimina() {
     visite = visite.filter(v => v.id !== eliminaId);
     salvaStorage();
     render();
+    scriviLog();
   }
   chiudiConferma();
 }
@@ -950,9 +1189,202 @@ document.getElementById("modal-impostazioni").addEventListener("click", function
   if (e.target === this) chiudiImpostazioni();
 });
 
+// ═══════════════════════════════════════════════════════════════════
+// ── Sincronizzazione log.md ──────────────────────────────────────
+// Usa la File System Access API (Chrome/Edge desktop, richiede http(s)
+// o localhost — non funziona aprendo il file con doppio click da
+// file://). L'handle del file viene salvato in IndexedDB così non
+// serve ricollegarlo ad ogni apertura (il browser potrebbe comunque
+// richiedere una conferma di permesso ad ogni sessione per motivi di
+// sicurezza). Su browser che non supportano l'API (Firefox, Safari,
+// mobile) si può comunque scaricare log.md manualmente ogni volta.
+// ═══════════════════════════════════════════════════════════════════
+
+let logHandle = null;
+let logDbPromise = null;
+
+function apriLogDb() {
+  if (logDbPromise) return logDbPromise;
+  logDbPromise = new Promise((resolve, reject) => {
+    if (!('indexedDB' in window)) return resolve(null);
+    const req = indexedDB.open("fisio_log_db", 1);
+    req.onupgradeneeded = () => req.result.createObjectStore("handles");
+    req.onsuccess = () => resolve(req.result);
+    req.onerror = () => resolve(null);
+  });
+  return logDbPromise;
+}
+async function salvaHandleDb(handle) {
+  const db = await apriLogDb();
+  if (!db) return;
+  return new Promise(resolve => {
+    const tx = db.transaction("handles", "readwrite");
+    tx.objectStore("handles").put(handle, "logFile");
+    tx.oncomplete = () => resolve();
+    tx.onerror = () => resolve();
+  });
+}
+async function caricaHandleDb() {
+  const db = await apriLogDb();
+  if (!db) return null;
+  return new Promise(resolve => {
+    const tx = db.transaction("handles", "readonly");
+    const req = tx.objectStore("handles").get("logFile");
+    req.onsuccess = () => resolve(req.result || null);
+    req.onerror = () => resolve(null);
+  });
+}
+
+function fsApiDisponibile() {
+  return typeof window.showSaveFilePicker === "function" && window.isSecureContext;
+}
+
+async function collegaLogFile() {
+  if (!fsApiDisponibile()) {
+    alert("Il tuo browser (o l'apertura del file da file://) non supporta il collegamento diretto al file.\n\nUsa invece il pulsante \"Scarica log.md\" per esportare manualmente il registro, oppure apri questa pagina tramite un piccolo server locale / Chrome o Edge su https.");
+    return;
+  }
+  try {
+    const handle = await window.showSaveFilePicker({
+      suggestedName: "log.md",
+      types: [{ description: "Markdown", accept: { "text/markdown": [".md"] } }]
+    });
+    logHandle = handle;
+    await salvaHandleDb(handle);
+    await scriviLog(true);
+    aggiornaLogStatusUI();
+  } catch (err) {
+    if (err.name !== "AbortError") console.error("Errore collegamento log.md:", err);
+  }
+}
+
+async function verificaPermessoLog(handle) {
+  if (!handle) return false;
+  const opts = { mode: "readwrite" };
+  if ((await handle.queryPermission(opts)) === "granted") return true;
+  try {
+    if ((await handle.requestPermission(opts)) === "granted") return true;
+  } catch (e) { /* richiede interazione utente */ }
+  return false;
+}
+
+async function scriviLog(forzaRichiestaPermesso) {
+  if (!fsApiDisponibile()) return;
+  if (!logHandle) logHandle = await caricaHandleDb();
+  if (!logHandle) { aggiornaLogStatusUI(); return; }
+
+  const haPermesso = forzaRichiestaPermesso
+    ? await verificaPermessoLog(logHandle)
+    : (await logHandle.queryPermission({ mode: "readwrite" })) === "granted";
+
+  if (!haPermesso) { aggiornaLogStatusUI(false); return; }
+
+  try {
+    const writable = await logHandle.createWritable();
+    await writable.write(generaLogMarkdown());
+    await writable.close();
+    aggiornaLogStatusUI(true);
+  } catch (err) {
+    console.error("Errore scrittura log.md:", err);
+    aggiornaLogStatusUI(false);
+  }
+}
+
+function generaLogMarkdown() {
+  const ordinate = [...visite].sort((a,b) => a.data.localeCompare(b.data));
+  const perMese = {};
+  ordinate.forEach(v => {
+    const key = v.data.substring(0,7);
+    if (!perMese[key]) perMese[key] = [];
+    perMese[key].push(v);
+  });
+
+  let out = `# Registro visite — Fisioterapia\n\n`;
+  out += `_Aggiornato automaticamente dal Registro Visite — ultima sincronizzazione: ${new Date().toLocaleString("it-IT")}_\n\n`;
+
+  let totaleGenerale = 0;
+  Object.keys(perMese).sort().forEach(key => {
+    const [yy, mm] = key.split("-");
+    const righe = perMese[key];
+    let totMese = 0;
+    out += `## ${MESI[parseInt(mm)-1]} ${yy}\n\n`;
+    out += `| Data | Categoria | Paziente | Ore | Importo | Note |\n`;
+    out += `|------|-----------|----------|-----|---------|------|\n`;
+    righe.forEach(v => {
+      const g = guadagno(v);
+      totMese += g;
+      const ore = v.categoria === "Giulia" ? v.ore : "—";
+      out += `| ${v.data} | ${v.categoria} | ${v.paziente} | ${ore} | €${g} | ${v.note || ""} |\n`;
+    });
+    out += `\n**Totale ${MESI[parseInt(mm)-1]} ${yy}: €${totMese.toFixed(2).replace(/\\.00$/,"")}**\n\n`;
+    totaleGenerale += totMese;
+  });
+
+  out += `---\n\n**Totale complessivo registrato: €${totaleGenerale.toFixed(2).replace(/\\.00$/,"")}**\n`;
+  return out;
+}
+
+function scaricaLogFallback() {
+  const contenuto = generaLogMarkdown();
+  const blob = new Blob([contenuto], { type: "text/markdown;charset=utf-8" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "log.md";
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function aggiornaLogStatusUI(scritturaRiuscita) {
+  const dot = document.getElementById("log-dot");
+  const text = document.getElementById("log-status-text");
+  const detail = document.getElementById("log-status-detail");
+  const btn = document.getElementById("btn-collega-log");
+  if (!dot) return;
+
+  if (!fsApiDisponibile()) {
+    dot.classList.remove("on");
+    text.textContent = "Collegamento diretto non disponibile";
+    detail.textContent = "Questo browser (o l'apertura via file://) non supporta il salvataggio diretto. Usa \"Scarica log.md\" ogni volta che aggiungi visite.";
+    btn.classList.remove("attivo");
+    return;
+  }
+  if (!logHandle) logHandle = await caricaHandleDb();
+  if (!logHandle) {
+    dot.classList.remove("on");
+    text.textContent = "Non collegato";
+    detail.textContent = "Collega il file log.md nella cartella del progetto per salvare automaticamente ogni visita.";
+    btn.classList.remove("attivo");
+    return;
+  }
+  const permOk = (await logHandle.queryPermission({ mode: "readwrite" })) === "granted";
+  if (permOk && scritturaRiuscita !== false) {
+    dot.classList.add("on");
+    text.textContent = `Collegato: ${logHandle.name}`;
+    detail.textContent = "Ogni visita aggiunta, modificata o eliminata viene salvata automaticamente in questo file.";
+    btn.classList.add("attivo");
+    btn.textContent = "📄 Ricollega log.md";
+  } else {
+    dot.classList.remove("on");
+    text.textContent = `Collegato ma permesso scaduto: ${logHandle.name}`;
+    detail.textContent = "Il browser richiede una nuova conferma per questa sessione. Premi \"Collega log.md\" per riautorizzare.";
+    btn.classList.remove("attivo");
+    btn.textContent = "📄 Riautorizza log.md";
+  }
+}
+
 // ── Init ───────────────────────────────────────────────────────────
 caricaStorage();
 render();
+(async () => {
+  logHandle = await caricaHandleDb();
+  if (logHandle) {
+    // prova a scrivere subito (senza forzare popup di permesso, che il browser bloccherebbe comunque senza gesto utente)
+    await scriviLog(false);
+  }
+})();
 </script>
 
 </body>
